@@ -15,6 +15,8 @@ var synthesis = new SpeechSynthesisUtterance()
 synthesis.lang = 'ja-JP'
 synthesis.rate = 1.0
 
+let timer
+
 export class Root extends Component {
 
   constructor(props) {
@@ -38,7 +40,6 @@ export class Root extends Component {
     ts.watch({type:'knock'}, (err, tuple)=> {
       if(!tuple.data.cmd) return
       if(tuple.data.cmd == 'move') this.movePosition()
-      if(tuple.data.cmd == 'enter') this.enterPosition()
     })
   }
 
@@ -53,6 +54,8 @@ export class Root extends Component {
   movePosition() {
     // MENUが隠れた状態だったらMENUを表示する
     if (this.state.menu) {
+      clearTimeout(timer)
+      timer = setTimeout(this.enterPosition.bind(this),1500)
       this.setState({
         position: downToPosition(this.state.position, this.props.menu)
       })
@@ -81,6 +84,7 @@ export class Root extends Component {
       this.playContents(getItemByPosition(this.state.position, this.props.menu))
       return
     }
+    timer = setTimeout(this.enterPosition.bind(this),1500)
     this.setState({
       position: new_pos
     })
@@ -120,7 +124,6 @@ export class Root extends Component {
 
   handleKeydown(e) {
     if(e.key == 'Enter') {
-      this.enterPosition()
     } else {
       this.movePosition()
     }
